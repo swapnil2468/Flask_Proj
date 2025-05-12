@@ -23,7 +23,7 @@ Refine the blog below to make it SEO-optimized:
 
 Return the optimized blog.
 """
-    model = genai.GenerativeModel("gemini-2.0-pro")
+    model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(prompt)
     return response.text
 
