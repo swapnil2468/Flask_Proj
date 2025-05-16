@@ -1,14 +1,17 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS  # 👈 import CORS
+from flask_cors import CORS
 import google.generativeai as genai
 import os
+import re
+import html
 from dotenv import load_dotenv
 
+# Load environment variables from .env file
 load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 app = Flask(__name__)
-CORS(app)  # 👈 enable CORS for all routes
+CORS(app)  # Enable CORS for all routes
 
 def seo_refine_blog(blog_content):
     prompt = f"""
@@ -32,9 +35,21 @@ Here is the blog:
 Return ONLY the HTML-formatted, optimized blog content. Do NOT add meta titles, descriptions, or keywords.
 """
 
+    # Call Gemini model
     model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(prompt)
-    return response.text.strip()
+
+    # Step 1: Remove ```html and ending ```
+    raw = response.text.strip()
+    if raw.startswith("```html"):
+        raw = raw.replace("```html", "", 1)
+    if raw.endswith("```"):
+        raw = raw.rsplit("```", 1)[0]
+
+    # Step 2: Decode HTML entities like &amp;, \u2019, etc.
+    clean_html = html.unescape(raw.strip())
+
+    return clean_html
 
 @app.route('/optimize-blog', methods=['POST'])
 def optimize_blog():
