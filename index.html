@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Blog Optimizer</title>
+</head>
+<body>
+  <textarea id="input" rows="10" cols="80" placeholder="Paste your blog here..."></textarea><br>
+  <button onclick="optimize()">Optimize Blog</button>
+  <div id="result" style="margin-top:20px; border:1px solid #ccc; padding:10px;"></div>
+
+  <script>
+    async function optimize() {
+      const blog = document.getElementById('input').value;
+      const res = await fetch('http://127.0.0.1:5000/optimize-blog', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ blog })
+      });
+      const data = await res.json();
+      document.getElementById('result').innerHTML = data.optimized_blog || data.error;
+    }
+  </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS  # 👈 import CORS
 import google.generativeai as genai
 import os
 from dotenv import load_dotenv
@@ -7,34 +8,36 @@ load_dotenv()
 genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 app = Flask(__name__)
+CORS(app)  # 👈 enable CORS for all routes
 
 def seo_refine_blog(blog_content):
     prompt = f"""
-You are an expert SEO strategist and content editor.
+        You are an expert SEO blog writer and web editor.
+        Your job is to fully optimize the following blog post for SEO while keeping its tone, voice, and structure.
 
-Your job is to optimize the following blog post for SEO while keeping the original meaning, tone, and structure intact.
+        Please follow these exact rules:
+        - Do NOT include any introductory messages or explanations.
+        - Return ONLY the optimized blog content in clean, SEO-ready HTML format.
+        - Use:
+        - <h1> for the main title
+        - <h2> for subheadings
+        - <p> for paragraphs
+        - <ul><li> for bullet points
+        - Add a short SEO meta section at the end using this format:
+        <meta-title>…</meta-title>
+        <meta-description>…</meta-description>
+        <meta-keywords>…</meta-keywords>
 
-Apply the following improvements:
-- Rewrite the title to be more compelling and keyword-rich
-- Add a strong, engaging introduction with a clear hook
-- Break content into logical sections with clear, keyword-focused H2 headings
-- Use short paragraphs and bullet points to enhance readability
-- Naturally insert relevant keywords, LSI terms, and long-tail phrases
-- Improve flow, grammar, and clarity without changing key points
-- End with a strong conclusion and a call-to-action
-- If missing, add suggested SEO meta title, description, and keywords at the bottom
+        Here is the blog:
+        ---BLOG START---
+        {blog_content}
+        ---BLOG END---
 
-Keep the content professional yet friendly. Don’t remove any important message or personal voice.
-
----BLOG START---
-{blog_content}
----BLOG END---
-
-Return only the fully optimized blog post.
-"""
-    model = genai.GenerativeModel("gemini-2.0-flash ")  # You can use "flash" if preferred, but "pro" is stronger
+        Return ONLY the HTML-formatted, optimized version.
+            """
+    model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(prompt)
-    return response.text
+    return response.text.strip()
 
 @app.route('/optimize-blog', methods=['POST'])
 def optimize_blog():
