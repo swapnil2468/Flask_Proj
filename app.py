@@ -17,7 +17,7 @@ def seo_refine_blog(blog_content):
     prompt = f"""
 You are an expert SEO blog writer and web editor.
 Your job is to fully optimize the following blog post for SEO while keeping its tone, voice, and structure.
-
+Make sure the returned output does not look too much AI genereated
 Please follow these exact rules:
 - Do NOT include any introductory messages or explanations.
 - Return ONLY the optimized blog content in clean, SEO-ready HTML format.
