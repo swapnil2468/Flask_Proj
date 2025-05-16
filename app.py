@@ -34,20 +34,18 @@ Here is the blog:
 
 Return ONLY the HTML-formatted, optimized blog content. Do NOT add meta titles, descriptions, or keywords.
 """
-
-    # Call Gemini model
     model = genai.GenerativeModel("gemini-2.0-flash")
     response = model.generate_content(prompt)
 
-    # Step 1: Remove ```html and ending ```
+    # Clean response: remove ```html ``` if present
     raw = response.text.strip()
     if raw.startswith("```html"):
         raw = raw.replace("```html", "", 1)
     if raw.endswith("```"):
         raw = raw.rsplit("```", 1)[0]
 
-    # Step 2: Decode HTML entities like &amp;, \u2019, etc.
-    clean_html = html.unescape(raw.strip())
+    # Final cleaning: remove all \n and extra whitespace
+    clean_html = raw.replace("\n", "").strip()
 
     return clean_html
 
