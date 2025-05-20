@@ -1,5 +1,7 @@
 /.env
 /saving.py
-/blog_ai_env
+/blog_ai
+/test.py
 index.html
 hello.html
+
